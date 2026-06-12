@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const login = useStore((s) => s.login);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +26,8 @@ export default function Login() {
       const user = await api.login(email, password);
       login(user);
       toast({ title: `Welcome back, ${user.name}! 🎉`, variant: "success" });
-      navigate(role === "artisan" ? "/dashboard" : "/marketplace");
+      const from = location.state?.from?.pathname;
+      navigate(from || (role === "artisan" ? "/dashboard" : "/marketplace"));
     } catch {
       toast({ title: "Login failed", description: "Please check your credentials.", variant: "destructive" });
     } finally { setLoading(false); }

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useStore } from "@/context/store";
 import Navbar from "@/components/layout/Navbar";
@@ -48,6 +48,16 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const user = useStore((s) => s.user);
+  const location = useLocation();
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return <>{children}</>;
+}
+
 function AppRoutes() {
   const location = useLocation();
   const isAR = location.pathname.startsWith("/ar/");
@@ -61,11 +71,11 @@ function AppRoutes() {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
             <Route path="/marketplace" element={<PageWrapper><Marketplace /></PageWrapper>} />
-            <Route path="/product/:id" element={<PageWrapper><ProductDetail /></PageWrapper>} />
-            <Route path="/artisan/:id" element={<PageWrapper><ArtisanProfile /></PageWrapper>} />
-            <Route path="/ar/:id" element={<ARPreview />} />
-            <Route path="/chat" element={<PageWrapper><Chat /></PageWrapper>} />
-            <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+            <Route path="/product/:id" element={<ProtectedRoute><PageWrapper><ProductDetail /></PageWrapper></ProtectedRoute>} />
+            <Route path="/artisan/:id" element={<ProtectedRoute><PageWrapper><ArtisanProfile /></PageWrapper></ProtectedRoute>} />
+            <Route path="/ar/:id" element={<ProtectedRoute><ARPreview /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><PageWrapper><Chat /></PageWrapper></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><PageWrapper><Dashboard /></PageWrapper></ProtectedRoute>} />
             <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
             <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
           </Routes>
