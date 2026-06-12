@@ -232,7 +232,15 @@ export default function Navbar() {
               exit={{ height: 0, opacity: 0 }}
               className="border-t border-border overflow-hidden bg-background/95 backdrop-blur-lg"
             >
-              <form onSubmit={handleSearch} className="container py-3 flex gap-3">
+              <form 
+                onSubmit={handleSearch} 
+                className="container py-3 flex gap-3"
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setSearchOpen(false);
+                  }
+                }}
+              >
                 <Input
                   autoFocus
                   placeholder="Search artisans, crafts, products..."
