@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 36 45% 96%;
+    --foreground: 25 28% 12%;
+    --card: 36 50% 99%;
+    --card-foreground: 25 28% 12%;
+    --muted: 34 30% 90%;
+    --muted-foreground: 25 15% 40%;
+    --border: 30 25% 85%;
+    --input: 30 25% 85%;
+    --ring: 22 55% 45%;
+    --radius: 0.9rem;
+  }
+
+  .dark {
+    --background: 25 28% 9%;
+    --foreground: 36 45% 95%;
+    --card: 25 24% 13%;
+    --card-foreground: 36 45% 95%;
+    --muted: 25 18% 18%;
+    --muted-foreground: 34 20% 65%;
+    --border: 25 18% 22%;
+    --input: 25 18% 22%;
+    --ring: 35 70% 60%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-display;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
