@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
-import { Package, Heart, BarChart3, ShoppingCart, Truck, CheckCircle, Clock, XCircle, Trash2, Eye } from "lucide-react";
+import { Package, Heart, BarChart3, ShoppingCart, Truck, CheckCircle, Clock, XCircle, Trash2, Eye, Camera } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ export default function Dashboard() {
   const user = useStore((s) => s.user);
   const cart = useStore((s) => s.cart);
   const wishlist = useStore((s) => s.wishlist);
+  const arScreenshots = useStore((s) => s.arScreenshots);
   const removeFromCart = useStore((s) => s.removeFromCart);
   const updateQuantity = useStore((s) => s.updateQuantity);
   const toggleWishlist = useStore((s) => s.toggleWishlist);
@@ -75,6 +76,7 @@ export default function Dashboard() {
           <TabsTrigger value="orders" id="tab-orders"><Package className="w-4 h-4 mr-1.5" /> Orders</TabsTrigger>
           <TabsTrigger value="cart" id="tab-cart"><ShoppingCart className="w-4 h-4 mr-1.5" /> Cart ({cart.length})</TabsTrigger>
           <TabsTrigger value="wishlist" id="tab-wishlist"><Heart className="w-4 h-4 mr-1.5" /> Wishlist ({wishlist.length})</TabsTrigger>
+          <TabsTrigger value="ar" id="tab-ar"><Camera className="w-4 h-4 mr-1.5" /> AR Captures</TabsTrigger>
           <TabsTrigger value="analytics" id="tab-analytics"><BarChart3 className="w-4 h-4 mr-1.5" /> Analytics</TabsTrigger>
         </TabsList>
 
@@ -171,6 +173,30 @@ export default function Dashboard() {
                         <Trash2 className="w-3.5 h-3.5 text-muted-foreground" />
                       </Button>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* AR CAPTURES */}
+        <TabsContent value="ar">
+          {arScreenshots.length === 0 ? (
+            <div className="text-center py-16">
+              <Camera className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <p className="font-display text-xl mb-2">No AR Captures yet</p>
+              <Button asChild className="mt-4"><Link to="/marketplace">Try AR Preview</Link></Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {arScreenshots.map((src, i) => (
+                <div key={i} className="relative rounded-2xl overflow-hidden border border-border group aspect-[3/4]">
+                  <img src={src} alt="AR Capture" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button variant="secondary" size="sm" asChild>
+                      <a href={src} download={`kalakshetra-ar-${i}.jpg`}>Download</a>
+                    </Button>
                   </div>
                 </div>
               ))}

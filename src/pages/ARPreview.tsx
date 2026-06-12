@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { Product } from "@/types";
 import { toast } from "@/hooks/use-toast";
+import { useStore } from "@/context/store";
+import html2canvas from "html2canvas";
 
 export default function ARPreview() {
   const { id } = useParams<{ id: string }>();
@@ -16,16 +18,45 @@ export default function ARPreview() {
   const [rotation, setRotation] = useState(0);
   const [scale, setScale] = useState(1);
   const [showInfo, setShowInfo] = useState(true);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const dragControls = useDragControls();
+  const addScreenshot = useStore((s) => s.addScreenshot);
 
   useEffect(() => {
     if (!id) return;
     api.getProductById(id).then((p) => { setProduct(p ?? null); setLoading(false); });
   }, [id]);
 
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then((stream) => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      })
+      .catch((err) => {
+        console.warn("Camera access denied or unavailable", err);
+      });
+
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, []);
+
   const handleCapture = async () => {
-    toast({ title: "Screenshot saved!", description: "AR preview captured to your gallery.", variant: "success" });
+    if (!containerRef.current) return;
+    try {
+      const canvas = await html2canvas(containerRef.current, { useCORS: true, backgroundColor: "#000" });
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      addScreenshot(dataUrl);
+      toast({ title: "Screenshot saved!", description: "Check your Dashboard to view it.", variant: "success" });
+    } catch (e) {
+      toast({ title: "Capture failed", description: "Could not take screenshot.", variant: "destructive" });
+    }
   };
 
   const handlePlace = () => {
@@ -52,11 +83,20 @@ export default function ARPreview() {
   return (
     <div className="relative w-full min-h-screen bg-black overflow-hidden flex flex-col">
       {/* Simulated camera feed */}
-      <div ref={canvasRef} className="flex-1 relative overflow-hidden">
+      <div ref={containerRef} className="flex-1 relative overflow-hidden bg-black">
+        {/* Real camera feed */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Fallback image if camera fails */}
         <img
           src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80"
           alt="Room background"
-          className="absolute inset-0 w-full h-full object-cover opacity-90"
+          className="absolute inset-0 w-full h-full object-cover opacity-30 -z-10"
         />
 
         {/* AR grid overlay */}
