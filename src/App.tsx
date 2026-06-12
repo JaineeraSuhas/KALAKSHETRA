@@ -14,6 +14,7 @@ import Chat from "@/pages/Chat";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
+import { SplashScreen } from "@/components/layout/SplashScreen";
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -78,6 +79,7 @@ function AppRoutes() {
 
 export default function App() {
   const theme = useStore((s) => s.theme);
+  const [showSplash, setShowSplash] = React.useState(true);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
@@ -86,7 +88,11 @@ export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
-        <AppRoutes />
+        {showSplash ? (
+          <SplashScreen onComplete={() => setShowSplash(false)} />
+        ) : (
+          <AppRoutes />
+        )}
       </div>
     </BrowserRouter>
   );
