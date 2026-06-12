@@ -22,6 +22,7 @@ interface AppState {
   isWishlisted: (productId: string) => boolean;
   arScreenshots: string[];
   addScreenshot: (dataUrl: string) => void;
+  removeScreenshot: (index: number) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -54,6 +55,7 @@ export const useStore = create<AppState>()(
       isWishlisted: (productId) => !!get().wishlist.find((p) => p.id === productId),
       arScreenshots: [],
       addScreenshot: (dataUrl) => set((s) => ({ arScreenshots: [dataUrl, ...s.arScreenshots] })),
+      removeScreenshot: (index) => set((s) => ({ arScreenshots: s.arScreenshots.filter((_, i) => i !== index) })),
     }),
     { name: "kalakshetra-store" }
   )

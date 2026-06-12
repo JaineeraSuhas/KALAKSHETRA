@@ -150,10 +150,10 @@ export default function ARPreview() {
               dragControls={dragControls}
               dragMomentum={false}
               initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: 1, scale: scale }}
               exit={{ opacity: 0, scale: 0.5 }}
               className="absolute cursor-grab active:cursor-grabbing"
-              style={{ left: "30%", top: "25%", rotate: rotation, scale }}
+              style={{ left: "30%", top: "25%", rotate: rotation }}
             >
               <div className="relative">
                 <img

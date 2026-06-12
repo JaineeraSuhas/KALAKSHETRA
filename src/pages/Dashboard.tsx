@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
 import { Package, Heart, BarChart3, ShoppingCart, Truck, CheckCircle, Clock, XCircle, Trash2, Eye, Camera } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
@@ -27,6 +27,7 @@ export default function Dashboard() {
   const cart = useStore((s) => s.cart);
   const wishlist = useStore((s) => s.wishlist);
   const arScreenshots = useStore((s) => s.arScreenshots);
+  const removeScreenshot = useStore((s) => s.removeScreenshot);
   const removeFromCart = useStore((s) => s.removeFromCart);
   const updateQuantity = useStore((s) => s.updateQuantity);
   const toggleWishlist = useStore((s) => s.toggleWishlist);
@@ -34,6 +35,7 @@ export default function Dashboard() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get("tab") || "orders";
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const totalSpend = monthlySpend.reduce((s, m) => s + m.amount, 0);
 
@@ -193,10 +195,18 @@ export default function Dashboard() {
               {arScreenshots.map((src, i) => (
                 <div key={i} className="relative rounded-2xl overflow-hidden border border-border group aspect-[3/4]">
                   <img src={src} alt="AR Capture" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Button variant="secondary" size="sm" asChild>
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                    <Button variant="secondary" size="sm" asChild className="w-24">
                       <a href={src} download={`kalakshetra-ar-${i}.jpg`}>Download</a>
                     </Button>
+                    <div className="flex gap-2">
+                      <Button variant="secondary" size="icon" onClick={() => setPreviewImage(src)}>
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button variant="destructive" size="icon" onClick={() => { removeScreenshot(i); toast({ title: "Deleted screenshot" }); }}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -254,6 +264,36 @@ export default function Dashboard() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* PREVIEW MODAL */}
+      <AnimatePresence>
+        {previewImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+            onClick={() => setPreviewImage(null)}
+          >
+            <div className="relative max-w-4xl max-h-[90vh] w-full flex items-center justify-center">
+              <Button 
+                variant="secondary" 
+                size="icon" 
+                className="absolute top-4 right-4 rounded-full z-10"
+                onClick={() => setPreviewImage(null)}
+              >
+                <XCircle className="w-6 h-6" />
+              </Button>
+              <img 
+                src={previewImage} 
+                alt="AR Preview Full" 
+                className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
